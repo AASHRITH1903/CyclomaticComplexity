@@ -1,8 +1,13 @@
 package antlr4;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.StringWriter;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.RuleContext;
+import org.json.simple.JSONObject;  
 
 import grammar.JavaBaseVisitor;
 import grammar.JavaParser;
@@ -16,6 +21,20 @@ import grammar.JavaParser.StatementContext;
 public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
 
 	protected Stack<Entry> entryStack = new Stack<Entry>();
+	protected BufferedWriter bw;
+	protected JSONObject jsonObj;
+	
+	// constructor
+	CyclomaticComplexityVisitor(String outputPath) {
+		try{
+			this.bw = new BufferedWriter(new FileWriter(outputPath, true));
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+ 		this.jsonObj = new JSONObject();
+
+    }
 
 	@Override
 	public Integer visitStatement(StatementContext ctx) {
@@ -59,6 +78,8 @@ public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
 		int methodDecisionPoints = methodEntry.decisionPoints;
 
 		System.out.printf(" - [%-20s method] - CC: %d\n", ctx.Identifier().getText(), methodDecisionPoints);
+		this.jsonObj.put(ctx.Identifier().getText(), methodDecisionPoints);
+
 
 		Entry classEntry = entryStack.peek();
 		classEntry.methodCount++;
@@ -83,6 +104,20 @@ public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
 		double avgCC = classEntry.methodCount != 0 ? classEntry.decisionPoints * 1f / classEntry.methodCount : 0;
 		
 		System.out.printf("[%-20s class] - avg CC: %.2f\n", ctx.Identifier().getText(), avgCC);
+		this.jsonObj.put(ctx.Identifier().getText(), avgCC);
+
+
+		try {
+      		StringWriter out = new StringWriter();
+      		this.jsonObj.writeJSONString(out);
+      
+      		String jsonText = out.toString();
+			bw.write(jsonText);
+			bw.close();	
+      		// System.out.print(jsonText);
+		} catch (Exception e) {
+			//TODO: handle exception
+		}
 
 		return res;
 	}
