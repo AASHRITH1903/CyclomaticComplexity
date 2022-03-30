@@ -27,7 +27,7 @@ public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
 	// constructor
 	CyclomaticComplexityVisitor(String outputPath) {
 		try{
-			this.bw = new BufferedWriter(new FileWriter(outputPath, true));
+			this.bw = new BufferedWriter(new FileWriter(outputPath, false));
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -77,7 +77,8 @@ public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
 
 		int methodDecisionPoints = methodEntry.decisionPoints;
 
-		System.out.printf(" - [%-20s method] - CC: %d\n", ctx.Identifier().getText(), methodDecisionPoints);
+		//System.out.printf(" - [%-20s method] - CC: %d\n", ctx.Identifier().getText(), methodDecisionPoints);
+
 		this.jsonObj.put(ctx.Identifier().getText(), methodDecisionPoints);
 
 
@@ -99,11 +100,12 @@ public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
 
 		Entry classEntry = entryStack.peek();
 
-		System.out.printf("overall methods count: %d\n", classEntry.methodCount);
+		// System.out.printf("overall methods count: %d\n", classEntry.methodCount);
 		
 		double avgCC = classEntry.methodCount != 0 ? classEntry.decisionPoints * 1f / classEntry.methodCount : 0;
 		
-		System.out.printf("[%-20s class] - avg CC: %.2f\n", ctx.Identifier().getText(), avgCC);
+		//System.out.printf("[%-20s class] - avg CC: %.2f\n", ctx.Identifier().getText(), avgCC);
+
 		this.jsonObj.put(ctx.Identifier().getText(), avgCC);
 
 
@@ -114,7 +116,6 @@ public class CyclomaticComplexityVisitor extends JavaBaseVisitor<Integer> {
       		String jsonText = out.toString();
 			bw.write(jsonText);
 			bw.close();	
-      		// System.out.print(jsonText);
 		} catch (Exception e) {
 			//TODO: handle exception
 		}

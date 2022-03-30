@@ -20,7 +20,8 @@ public class Main {
 		JavaParser parser = new JavaParser(tokens);
 		ParserRuleContext tree = parser.compilationUnit();
 		
-		CyclomaticComplexityVisitor mv = new CyclomaticComplexityVisitor(args[1]);
+		// NOTE : hard-coded path to output file
+		CyclomaticComplexityVisitor mv = new CyclomaticComplexityVisitor("../output/Output.json");
 		mv.visit(tree);
 	}
 }
